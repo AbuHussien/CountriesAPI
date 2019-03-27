@@ -13,18 +13,23 @@ public class CountryService {
     @Autowired
     CountryRepository countryRepository;
 
-    public List<Country>findByCountry(String name, String code, Integer page) {
+    public Page<Country>findByCountry(Integer page) {
+        if(page != null)
+            return countryRepository.findAll(new PageRequest(page, 10));
+        else
+            return countryRepository.findAll(new PageRequest(0, 10));
+    }
+
+    public List<Country>findByCountryNameCode(String name, String code, List<String> countriesNames) {
         List<Country> countries = new ArrayList<>();
         if (code != null)
             countries.add(countryRepository.findById(code).get());
         else
-            if (name != null)
-                countries.add(countryRepository.findByName(name));
-            else
-                if(page != null)
-                    return countryRepository.findAll(new PageRequest(page, 10)).getContent();
-                else
-                    return countryRepository.findAll();
+        if (name != null)
+            countries.add(countryRepository.findByName(name));
+        else
+        if(countriesNames != null)
+            return countryRepository.findByNameIn(countriesNames);
         return countries;
     }
 }
